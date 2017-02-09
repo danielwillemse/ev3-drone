@@ -11,7 +11,7 @@ defmodule Ev3 do
   end
 
   def platform do
-    Application.get_env(:ev3, :platform)
+    System.get_env("NERVES_TARGET")
   end
 
   defp load_ev3_modules() do

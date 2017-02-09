@@ -1,7 +1,7 @@
 defmodule Drone.Mixfile do
   use Mix.Project
 
-  @target "nerves_system_ev3"
+  @target System.get_env("NERVES_TARGET") || "ev3"
 
   def project do
     [app: :drone,

@@ -25,4 +25,5 @@ config :nerves_ev3_example, :wlan0,
   key_mgmt: :"WPA-PSK",
   psk: "<<>>"
 
-import_config "#{Mix.env}.exs"
+
+import_config "#{System.get_env("NERVES_TARGET")}.exs"
