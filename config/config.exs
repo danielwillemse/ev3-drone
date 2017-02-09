@@ -24,3 +24,5 @@ config :nerves_ev3_example, :wlan0,
   ssid: "<<>>",
   key_mgmt: :"WPA-PSK",
   psk: "<<>>"
+
+import_config "#{Mix.env}.exs"
