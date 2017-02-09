@@ -89,7 +89,6 @@ defmodule Ev3 do
       (0..3) |> Enum.map(fn(nr) ->
         [root_path(), device, nr]
         |> Enum.join("/")
-        |> IO.inspect(label: "creating files")
         |> File.mkdir_p()
       end)
     end)
