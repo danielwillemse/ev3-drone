@@ -1,17 +1,18 @@
 defmodule Ev3 do
+
+  def platform do
+    Drone.Mixfile.platform()
+  end
+
   def bootstrap! do
     case platform() do
       "ev3" ->
+        IO.puts("bootstrapping Ev3")
         load_ev3_modules()
         start_writable_fs()
         start_wifi()
-      _ ->
-        init_device_files()
+      _ -> nil
     end
-  end
-
-  def platform do
-    System.get_env("NERVES_TARGET")
   end
 
   defp load_ev3_modules() do
@@ -80,18 +81,6 @@ defmodule Ev3 do
           error -> error
         end
     end
-  end
-
-  defp init_device_files do
-    IO.inspect(root_path, label: "root_path")
-    ~w(tacho-motor lego-sensor)
-    |> Enum.map(fn(device) ->
-      (0..3) |> Enum.map(fn(nr) ->
-        [root_path(), device, nr]
-        |> Enum.join("/")
-        |> File.mkdir_p()
-      end)
-    end)
   end
 
   def root_path do
