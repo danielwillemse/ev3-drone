@@ -1,7 +1,7 @@
 defmodule Ev3 do
 
   def platform do
-    Drone.Mixfile.platform()
+    System.get_env("NERVES_TARGET") || "ev3"
   end
 
   def bootstrap! do
