@@ -26,4 +26,4 @@ config :drone, :wlan0,
   psk: "<<>>"
 
 
-import_config "#{System.get_env("NERVES_TARGET")}.exs"
+import_config "#{System.get_env("NERVES_TARGET") || "ev3"}.exs"
