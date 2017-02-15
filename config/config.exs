@@ -20,7 +20,7 @@ config :nerves_interim_wifi,
   regulatory_domain: "US"
 
 # Change these options to your
-config :nerves_ev3_example, :wlan0,
+config :drone, :wlan0,
   ssid: "<<>>",
   key_mgmt: :"WPA-PSK",
   psk: "<<>>"
