@@ -9,4 +9,21 @@ defmodule Ev3.Device.MotorTest do
 
     assert %{type: :large} = Motor.report(:motor0)
   end
+
+  test "it writes a command" do
+    {:ok, _pid} = Motor.start_link("motor0")
+
+    Motor.execute(:motor0, :speed_sp, "500")
+
+    :timer.sleep 50
+    assert "500" = Ev3.Util.read!("tacho-motor", "motor0", "speed_sp")
+  end
+
+  test "it only writes a valid command" do
+    {:ok, _pid} = Motor.start_link("motor0")
+
+    assert_raise Ev3.Device.InvalidCommandError, fn ->
+      Motor.execute(:motor0, :exit, "now")
+    end
+  end
 end
