@@ -8,6 +8,7 @@
 /_images
 /.nerves
 test/support/ev3/
+ev3/dev/
 .iex.exs
 
 # Generate on crash by the VM
