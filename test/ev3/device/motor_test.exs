@@ -15,7 +15,7 @@ defmodule Ev3.Device.MotorTest do
 
     Motor.execute(:motor0, :speed_sp, "500")
 
-    :timer.sleep 50
+    :timer.sleep 10
     assert "500" = Ev3.Util.read!("tacho-motor", "motor0", "speed_sp")
   end
 
@@ -25,5 +25,17 @@ defmodule Ev3.Device.MotorTest do
     assert_raise Ev3.Device.InvalidCommandError, fn ->
       Motor.execute(:motor0, :exit, "now")
     end
+  end
+
+  test "it polls the status of the motor" do
+    {:ok, _pid} = Motor.start_link("motor0")
+
+    assert %{status: :connected} = Motor.report(:motor0)
+  end
+
+  test "it returns not_connected if motor is not found" do
+    {:ok, _pid} = Motor.start_link("motor99")
+
+    assert %{status: :not_connected} = Motor.report(:motor99)
   end
 end

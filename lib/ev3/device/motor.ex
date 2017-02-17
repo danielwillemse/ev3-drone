@@ -4,7 +4,7 @@ defmodule Ev3.Device.Motor do
   @device_path "tacho-motor"
   @valid_calls ~w(speed_sp command)a
 
-  defstruct [:device, :type, :path]
+  defstruct [:device, :type, :path, :status]
 
   ### API ###
 
@@ -31,6 +31,7 @@ defmodule Ev3.Device.Motor do
     motor =
       motor
       |> add_stat(:type)
+      |> add_stat(:status)
 
     {:reply, motor, motor}
   end
@@ -44,10 +45,26 @@ defmodule Ev3.Device.Motor do
 
   defp add_stat(motor, :type) do
     type =
-       Ev3.Util.read!(@device_path, motor.path, "driver_name")
-      |> driver_name_to_type()
+      if is_connected?(motor.path) do
+        Ev3.Util.read!(@device_path, motor.path, "driver_name")
+        |> driver_name_to_type()
+      end
 
-    %{motor | type: type}
+    motor |> Map.put(:type, type)
+  end
+
+  defp add_stat(motor, :status) do
+    status = if is_connected?(motor.path), do: :connected, else: :not_connected
+
+    motor |> Map.put(:status, status)
+  end
+
+  defp connected_devices do
+    Ev3.Util.ls(@device_path)
+  end
+
+  defp is_connected?(name) do
+    connected_devices |> Enum.any?(fn(f) -> f == name end)
   end
 
   defp driver_name_to_type(driver_name) do
