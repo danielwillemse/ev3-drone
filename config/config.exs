@@ -25,5 +25,4 @@ config :drone, :wlan0,
   key_mgmt: :"WPA-PSK",
   psk: "<<>>"
 
-
-import_config "#{System.get_env("NERVES_TARGET") || "ev3"}.exs"
+import_config "#{Mix.env}.exs"

@@ -84,6 +84,10 @@ defmodule Ev3 do
   end
 
   def root_path do
-    Application.get_env(:drone, :ev3)[:base_path]
+    config[:base_path]
+  end
+
+  def config do
+    Application.get_env(:drone, :ev3)
   end
 end
