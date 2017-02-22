@@ -1,17 +1,11 @@
 defmodule Ev3 do
 
-  def platform do
-    System.get_env("NERVES_TARGET") || "ev3"
-  end
-
   def bootstrap! do
-    case platform() do
-      "ev3" ->
-        IO.puts("bootstrapping Ev3")
-        load_ev3_modules()
-        start_writable_fs()
-        start_wifi()
-      _ -> nil
+    if config()[:load_modules] do
+      IO.puts("bootstrapping Ev3")
+      load_ev3_modules()
+      start_writable_fs()
+      start_wifi()
     end
   end
 
