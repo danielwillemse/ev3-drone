@@ -1,6 +1,8 @@
 defmodule Ev3.Device.Motor do
   use GenServer
 
+  alias Ev3.Device
+
   @device_path "tacho-motor"
   @valid_calls ~w(speed_sp command)a
 
@@ -16,8 +18,20 @@ defmodule Ev3.Device.Motor do
     GenServer.call(pid, :report)
   end
 
+  def execute(pids, command, value) when is_list(pids) do
+    validate_command!(command)
+    pids
+    |> Enum.each(fn(pid) ->
+      do_execute(pid, command, value)
+    end)
+  end
+
   def execute(pid, command, value) do
     validate_command!(command)
+    do_execute(pid, command, value)
+  end
+
+  defp do_execute(pid, command, value) do
     GenServer.cast(pid, {:execute, command |> Atom.to_string, value})
   end
 
@@ -27,13 +41,19 @@ defmodule Ev3.Device.Motor do
 
   ### Callbacks ###
 
-  def handle_call(:report, _from, motor) do
-    motor =
-      motor
-      |> add_stat(:type)
-      |> add_stat(:status)
+  def handle_call(:report, _from, %{status: :connected} = motor) do
+    motor = motor |> add_stat(:type)
 
     {:reply, motor, motor}
+  end
+
+  def handle_call(msg, _from, %{status: :not_connected} = motor) do
+    {:reply, motor, motor}
+  end
+
+  def handle_call(msg, from, motor) do
+    motor = motor |> add_stat(:status)
+    handle_call(msg, from, motor)
   end
 
   def handle_cast({:execute, command, value}, motor) do
@@ -45,7 +65,7 @@ defmodule Ev3.Device.Motor do
 
   defp add_stat(motor, :type) do
     type =
-      if is_connected?(motor.path) do
+      if Device.connected?(@device_path, motor.path) do
         Ev3.Util.read!(@device_path, motor.path, "driver_name")
         |> driver_name_to_type()
       end
@@ -54,17 +74,9 @@ defmodule Ev3.Device.Motor do
   end
 
   defp add_stat(motor, :status) do
-    status = if is_connected?(motor.path), do: :connected, else: :not_connected
+    status = if Device.connected?(@device_path, motor.path), do: :connected, else: :not_connected
 
     motor |> Map.put(:status, status)
-  end
-
-  defp connected_devices do
-    Ev3.Util.ls(@device_path)
-  end
-
-  defp is_connected?(name) do
-    connected_devices |> Enum.any?(fn(f) -> f == name end)
   end
 
   defp driver_name_to_type(driver_name) do
@@ -77,7 +89,7 @@ defmodule Ev3.Device.Motor do
 
   defp validate_command!(command) do
     if !Enum.any?(@valid_calls, fn(c) -> c == command end) do
-      raise Ev3.Device.InvalidCommandError
+      raise Device.InvalidCommandError
     end
   end
 end

@@ -27,6 +27,24 @@ defmodule Ev3.Device.MotorTest do
     end
   end
 
+  test "it writes the command for all given motors" do
+    {:ok, _pid} = Motor.start_link("motor0")
+    {:ok, _pid} = Motor.start_link("motor1")
+
+    Motor.execute([:motor0, :motor1], :speed_sp, "500")
+
+    :timer.sleep 10
+    assert "500" = Ev3.Util.read!("tacho-motor", "motor0", "speed_sp")
+    assert "500" = Ev3.Util.read!("tacho-motor", "motor1", "speed_sp")
+  end
+
+  test "it does not write commands to motors that are connected" do
+    Ev3.Util.write!("tacho-motor", "motor0", "speed_sp", "nothing written")
+    Motor.execute(:motor0, :speed_sp, "500")
+
+    assert "nothing written" = Ev3.Util.read!("tacho-motor", "motor0", "speed_sp")
+  end
+
   test "it polls the status of the motor" do
     {:ok, _pid} = Motor.start_link("motor0")
 
