@@ -29,7 +29,7 @@ defmodule Ev3 do
   end
 
   defp start_wifi() do
-    opts = Application.get_env(:nerves_ev3_example, :wlan0)
+    opts = Application.get_env(:drone, :wlan0)
     Nerves.InterimWiFi.setup "wlan0", opts
   end
 
