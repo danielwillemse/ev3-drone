@@ -10,13 +10,12 @@ defmodule Drone do
 
     # Define workers and child supervisors to be supervised
     children = [
-      # worker(Drone.Worker, [arg1, arg2, arg3]),
+      supervisor(Ev3.DeviceSupervisor, [strategy: :one_for_one])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Drone.Supervisor]
     Supervisor.start_link(children, opts)
-
   end
 end
